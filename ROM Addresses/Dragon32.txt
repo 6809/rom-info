@@ -1,0 +1,631 @@
+###############################################################################
+# Information about Dragon 32 ROM
+#
+# Collected from:
+#     http://dragon32.info/info/memmap.html - Dragon 32/64 Memory Map (with CoCo refs)
+#     http://dragon32.info/info/romref.html - Dragon 32/64 ROM Reference guide
+# AUTHOR: Graham E. Kinns
+#
+# copyleft: 2014 by the 6809 team, see AUTHORS for more details.
+# license: GNU GPL v3 or above, see LICENSE for more details.
+#
+###############################################################################
+
+$00         ; BREAK message flag - if negative print BREAK
+$01         ; String delimiting char (0x22 '"')
+$02         ; Another delimiting char (0x22 '"')
+$03         ; General counter byte
+$04         ; Count of IFs looking for ELSE
+$05         ; DIM flag
+$06         ; %VALTYP% Variable type flag (0x00 numeric, Non-0x00 string)
+$07         ; Garbage collection flag
+$08         ; Subscript allowed flag
+$09         ; INPUT/READ flag
+$0a         ; Arithmetic use
+$0b-$0c     ; String ptr first free temporary
+$0d-$0e     ; String ptr last free temporary
+$0f-$18     ; Temporary results
+$19-$1a     ; Start address of BASIC program ($1e01, $2401 with DOS)
+$1b-$1c     ; Start address of simple variables
+$1d-$1e     ; Start address of array variables
+$1f-$20     ; End of storage, Start of unused mem after BASIC program
+$21-$22     ; Top of stack, growing down ($7e36)
+$23-$24     ; Top of free string space ($7ffe)
+$25-$26     ; Temp Ptr to string in string space
+$27-$28     ; Top of Ram available to BASIC - returned by DOS HIMEM ($7ffe)
+$29-$2a     ; Last/CONT line number
+$2b-$2c     ; Temp/Input line number store
+$2d-$2e     ; Ptr to next statement to be executed
+$2f-$30     ; Direct mode command text pointer
+$31-$32     ; Current DATA statement line number
+$33-$34     ; Ptr to next item in current DATA statement
+$35-$36     ; Ptr to keyboard input buffer
+$37-$38     ; Ptr to variable last in use
+$37-$38     ; ASCII codes of last variable used {1}
+$39-$3a     ; VARPTR address of last variable used
+$3b-$4e     ; Evaluation variables
+$41-$42     ; High end destination addr for block
+$43-$44     ; High end origin addr
+$45-$46     ; Low end destination addr for block
+$47-$48     ; Low end origin addr
+$4f-$54     ; Floating Point Accumulator Num 1
+$4f         ; Exponent
+$50-$53     ; Mantissa
+$50-$51     ; 16 bit values in FAC stored here
+$52-$53     ; VARPTR of variables is stored here {1}
+$54         ; Mantissa Sign (0x00 positive, 0xff negative)
+$55         ; Temp sign of FAC
+$56         ; String variable length
+$57-$5b     ; String Descriptor temporaries
+$5c-$61     ; Floating Point Accumulator Num 2
+$62         ; Sign comparison
+$62-$67     ; Misc use
+$63         ; CoCo - Extended precision byte {1} - also Dragon ?
+$68-$69     ; Current Line number (0xffff in direct mode)
+$6a-$6e     ; Device Params used in PRINT
+$6a         ; Device Comma field width (VDU - 0x10)
+$6b         ; Device Last comma field
+$6c         ; Device Current column num (VDU - 0x00-0x1f)
+$6d         ; Device Line width - num chars per line (VDU 0x20)
+$6e         ; Cassette I/O in progress flag - 0xff on input or output occurring  {9}
+$6f         ; %DEVNUM% Current device number 0x00 VDU screen 0x01-0x04 DOS - DosPlus only - drive number. 0xfd serial port (Dragon 64 only) 0xfe printer 0xff tape
+$70         ; Cassette EOF flag - non-zero if EOF - used by EOF(-1) {9}
+$71         ; Restart flag - if not 0x55 cold start on reset, see $0072
+$72-$73     ; Restart vector - Following a reset if $0072 pts to a NOP opcode and $0071 is 0x55 then a warm start is performed to this vector else a cold start. (0xb44f) (DOS SuperDosE6 $c706)
+$74-$75     ; Physical end of Ram minus 1 (0x7ffe)
+$76-$77     ; Unused
+$78         ; Cassette status 0x00 closed 0x01 input 0x02 output
+$79         ; Cassette I/O - Buffer size - bytes in block
+$7a-$7b     ; Header buffer addr - ptr to filename block
+$7c         ; %BLKTYP% Cassette block type 0x00 filename 0x01 data 0xff EOF block
+$7d         ; %DBLEN% Cassette block length, number bytes read/to write
+$7e-$7f     ; %DBADR% Cassette I/O Buffer address Contains 1 + End address of last program loaded
+$80         ; Cassette I/O - block checksum used internally
+$81         ; Cassette I/O - error code 0x00 none 0x01 CRC (checksum) error 0x02 attempt to load into ROM
+$82         ; Cassette I/O - Pulse width counter
+$83         ; Cassette I/O - Sync bits counter
+$84         ; Cassette I/O - Bit phase flag
+$85         ; Last sine wave value for output to DAC
+$86         ; Data for low res SET/RESET, POINT routines
+$87         ; ASCII code of last key pressed (cleared by Break check)
+$88-$89     ; Current VDU cursor addr (typ 0x0400-0x05ff)
+$8a-$8b     ; Gen purpose 16bit scratch pad / 16bit zero (0x0000) {2}
+$8a-$8b     ; CoCo - Motor on delay
+$8c         ; Sound pitch frequency
+$8d-$8e     ; Gen purpose countdown (?sound timer {2})
+$8f         ; Cursor flash counter (0x20)
+$90-$91     ; Cassette leader byte count - number of 0x55 bytes written as sync leader (D32 - 0x0080, D64 - 0x0100)
+$92         ; Minimum cycle width of 1200Hz (0x12)
+$92-$93     ; CoCo - Cassette leader byte count
+$93         ; Minimum pulse width of 1200Hz (0x0a)
+$94         ; Maximum pulse width of 1200Hz (0x12)
+$95-$96     ; Motor on delay (0xda5c = approx 0.5s)
+$95-$96     ; CoCo - Serial Baud rate constant (0x0057 = 600 baud)
+$97-$98     ; Keyboard scan debounce delay constant (0x045e)
+$97-$98     ; CoCo - Serial Line Printer End of Line delay (0x0001)
+$99         ; Printer comma field width (0x10 = 16)
+$9a         ; Printer last comma field (0x74 = 116) (CoCo 0x70 = 112)
+$9b         ; Printer line width dflt (0x84 = 132)
+$9c         ; Printer head column posn == POS(-2) Updated by LPOUT ($800f) routine
+$9d-$9e     ; EXEC default entry address (D32 - $8b8d = ?FC ERROR; D64 - $bf49 = Boot 64k mode)
+$9f-$aa     ; %CHRGET% Self modifying routine to read next char
+$9f-$a0     ; INC <$A7
+$a1-$a2     ; BNE $00A5
+$a3-$a4     ; INC <$A6
+$a5-$a7     ; LDA >xxxx
+$a6-$a7     ; Ptr to next character to read
+$a8-$aa     ; JMP $BB26
+$ab-$ae     ; Used by RND
+$af         ; TRON/TROFF trace flag - non zero for TRON
+$b0-$b1     ; Ptr to start of USR table ($0134; DOS - $0683)
+$b2         ; Current foreground colour (0x03)
+$b3         ; Current background colour (0x00)
+$b4         ; Temp/active colour in use
+$b5         ; Byte value for current colour - ie bit pattern
+$b6         ; Graphics PMODE number in use (0x00)
+$b7-$b8     ; Ptr to last byte+1 of current graphics mode ($0c00 w/o Dos)
+$b9         ; Number of bytes per line in current PMODE (0x10)
+$ba-$bb     ; Ptr to first byte of current graphics mode ($0600)
+$bc         ; Msb of start of graphics pages (0x06 or 0x0c with Dos)
+$bd-$be     ; Current X cursor position (not user available ?{1})
+$bf-$c0     ; Current Y cursor position (not user available ?{1})
+$c1         ; Colour set currently in use (0x08 if colorset 1 {1})
+$c2         ; Plot/Unplot flag: 0x00 reset, non zero set
+$c3-$c4     ; Current horizontal pixel number
+$c5-$c6     ; Current vertical pixel number
+$c7-$c8     ; Current X cursor coord (0x0080)
+$c9-$ca     ; Current Y cursor coord (0x0060)
+$cb-$cc     ; CIRCLE command X coood as if drawn in PMODE 4
+$cd-$ce     ; CIRCLE command Y coord as if drawn in PMODE 4
+$cf-$d0     ; CIRCLE radius as if drawn in PMODE 4
+$cf-$d0     ; RENUM increment value
+$d1-$d2     ; RENUM start line
+$d3-$d4     ; CLOADM 2's complement load offset
+$d5-$d6     ; RENUM new start line
+$d7         ; EDIT line length (not user available)
+$d7         ; PLAY -
+$d8         ; PLAY - bytes left in string
+$d9-$da     ; PLAY - ptr to current char in string
+$d8-$dd     ; Graphics use ? {2}
+$de         ; PLAY: Current octave in use (0-4) (0x02)
+$df-$e0     ; PLAY: Volume data for volume setting (D32 - 0xba42) (D64 - 0xb844)
+$e1         ; PLAY: Current note length (0x04)
+$e2         ; PLAY: Current tempo (0x02)
+$e3-$e4     ; PLAY: Music duration count
+$e5         ; PLAY: Music dotted note flag
+$e6-$ff     ; D32 - Unused in Dragon 32 w/o DOS
+$e6         ; CoCo - baud rate constant
+$e7         ; Coco - Input timeout constant
+$e8         ; Current angle used in DRAW {1} (??)
+$e9         ; Current scale used in DRAW {1} (??)
+$ea-$f6     ; DOS - Used by DragonDos
+$f8         ; DOS - sector currently seeking {SuperDos Rom}
+$0100-$0102 ; SWI3 Secondary vector (Uninitialised)
+$0103-$0105 ; SWI2 Secondary vector (Uninitialised)
+$0106-$0108 ; SWI Secondary vector (Uninitialised)
+$0109-$010b ; NMI Secondary vector (Uninitialised) (CoCo DOS JMP $d7ae; SuperDos E6 JMP $c71e)
+$010c-$010e ; IRQ Secondary vector - JMP $9d3d (CoCo JMP $a9b3 or $894c (extended); CoCo DOS JMP $d7bc; SuperDos E6 JMP $c727)
+$010f-$0111 ; FIRQ Secondary vector - JMP $b469 (CoCo JMP $a0f6; SuperDos E6 JMP $c7da)
+$0112-$0113 ; TIMER value
+$0114       ; Unused
+$0115-$0119 ; Random number seeds (0x80, 0x4f, 0xc7, 0x52, 0x59)
+$011a-$011f ; D32 - Unused
+$011a       ; D64 - %FLAG64% checked on Reset from 64K mode if 0x55 then checksum at $011b is checked against current contents of Ram, if the same then a warm start is performed (64 mode) else a cold start (32 mode)
+$011a       ; CoCo - Caps lock, 0x00 lower, non-0x00 upper
+$011b-$011c ; D64 - %CSUM64% 16bit sum of words of BASIC Rom-in-ram in 64K mode from $c000 to $feff
+$011b-$011c ; CoCo - Keyboard Delay constant
+$011d-$011f ; CoCo - JMP $8489 ? {1}
+$011d       ; D64 - %LSTKEY% Last key code return by keybd poll routine
+$011e       ; D64 - %CNTDWN% Auto repeat countdown
+$011f       ; D64 - %REPDLY% Auto repeat inter-repeat delay value (0x05)
+$0120       ; %STUB0% Stub 0 - Number of reserved words (0x4e)
+$0121-$0122 ; Stub 0 - Ptr to reserved words table ($8033)
+$0123-$0124 ; Stub 0 - Ptr to reserved words dispatch table ($8154)
+$0125       ; Stub 0 - Number of functions (0x22)
+$0126-$0127 ; Stub 0 - Ptr to reserved function words table ($81ca)
+$0128-$0129 ; Stub 0 - Ptr to function words dispatch table ($8250)
+$012a       ; %STUB1% Stub 1 - Number of reserved words (0x00) (DOS 0x1a)
+$012b-$012c ; Stub 1 - Ptr to reserved words table (0x0000) (DOS $ded4; SuperDosE6 $deda)
+$012d-$012e ; Stub 1 - Ptr to reserved words token processing routine ($89b4; DOS $c64c; SuperDosE6 $c670)
+$012f       ; Stub 1 - Number of functions (0x00) (DOS 0x07)
+$0130-$0131 ; Stub 1 - Ptr to function table (0x0000) (DOS $debb; SuperDosE6 $dec1)
+$0132-$0133 ; Stub 1 - Ptr to function token processing routine ($89b4; DOS $c667; SuperDosE6 $c68b)
+$0134       ; %STUB2% Stub 2 - acts as a stub terminator under DOS
+$0134-$0147 ; USR address table, relocated by DOS (10 x 2 bytes) ($8b8d)
+$0148       ; Auto line feed flag on buffer full - setting this to 0x00 causes a EOL sequence to be sent to printer when buffer reaches length in $009b (0xff)
+$0149       ; Alpha Lock flag - 0x00 Lower case, 0xff Upper case (0xff)
+$014a-$0150 ; Line Printer End of line termination sequence
+$014a       ; Number of bytes in EOL sequence 1-6 (0x01)
+$014b       ; EOL chr 1 (0x0d CR)
+$014c       ; EOL chr 2 (0x0a LF)
+$014d       ; EOL chr 3 (D64 - 0x00; D32 - 0x20 ' ')
+$014e       ; EOL chr 4 (D64 - 0x00; D32 - 0x44 'D' Duncan)
+$014f       ; EOL chr 5 (D64 - 0x00; D32 - 0x4e 'N' N.)
+$0150       ; EOL chr 6 (D64 - 0x00; D32 - 0x4f 'S' Smeed)
+$0151-$0159 ; Keyboard matrix state table
+$0152-$0159 ; CoCo - Keyboard roll-over table
+$015a-$015d ; %POTVAL% Joystick values (0-63)
+$015a       ; Right Joystick, x value == JOYSTK(0)
+$015b       ; Right Joystick, y value == JOYSTK(1)
+$015c       ; Left Joystick, x value == JOYSTK(2)
+$015d       ; Left Joystick, y value == JOYSTK(3)
+$015e-$01a8 ; Ram hooks - each is called from ROM with a JSR before carrying out the specified function
+$015e-$0160 ; Device Open (DOS JMP $d902; SuperDosE6 $d8f4)
+$0161-$0163 ; Verify Device Number (DOS SuperDosE6 JMP $d8ec)
+$0164-$0166 ; Device Init (DOS SuperDosE6 JMP $c29c)
+$0167-$0169 ; Output char in A to DEVN (DOS JMP $d8fa; SuperDosE6 $d90b)
+$0167       ; Setting to 0xff disables keyboard ?!? {1} Setting to 0x39 (RTS) allows use of SCREEN 0,1 etc. ??{1}
+$016a-$016c ; Input char from DEVN to A (DOS SuperDosE6 JMP $c29c)
+$016d-$016f ; Input from DEVN using INPUT (DOS SuperDosE6 JMP $c29c)
+$0170-$0172 ; Output to DEVN using PRINT (DOS SuperDosE6 JMP $c29c)
+$0173-$0175 ; Close all files (DOS SuperDosE6 JMP $c29c)
+$0176-$0178 ; Close file (DOS JMP $d917; SuperDosE6 $d6f5)
+$0179-$017b ; Command Interpreter - interpret token in A as command (DOS SuperDosE6 JMP $c29c)
+$017c-$017e ; Re-request input from keyboard (DOS JMP $d960; SuperDosE6 $d954)
+$017f-$0181 ; Check keys - scan for BREAK, SHIFT+'@' (DOS SuperDosE6 JMP $c29c)
+$017f       ; Setting this to 0x9e disables LIST/DIR {1}
+$0182-$0184 ; Line input from DEVN using LINE INPUT (DOS JMP $d720; SuperDosE6 $dac5)
+$0185-$0187 ; Close BASIC file read in and goto Command mode (DOS SuperDosE6 JMP $c29c)
+$0188-$018a ; Check EOF on DEVN (DOS JMP $dd4d; SuperDosE6 $dd54)
+$018b-$018d ; Evaluate expression (DOS SuperDosE6 JMP $c29c)
+$018e-$0190 ; User error trap, called from $8344 (DOS SuperDosE6 JMP $c29c)
+$0191-$0193 ; System error trap, called from $8344 (DOS JMP $c69e; SuperDosE6 $c6c5)
+$0194-$0196 ; Run Link - used by DOS to RUN filename (DOS JMP $d490; SuperDosE6 $d4b7)
+$0197-$0199 ; Reset Basic Memory, editing or entering BASIC lines
+$019a-$019c ; Get next command - reading in next command to be executed
+$019d-$019f ; Assign string variable
+$01a0-$01a2 ; Screen access - CLS, GET, PUT
+$01a3-$01a5 ; Tokenise line
+$01a6-$01a8 ; De-Tokenise line
+$01a9-$01d0 ; String buffer area
+$01d1       ; Cassette filename length in range 0-8
+$01d2-$01d9 ; Cassette filename to search for or write out
+$01da-$02d8 ; Cassette I/O default data buffer - 255 bytes
+$01da-$0268 ; D64 - 64K mode bootstrap routine is copied here to run
+$01da-$01e1 ; Cassette buffer - filename of file read
+$01e2       ; Cassette buffer - filetype 0x00 BASIC program 0x01 Data 0x02 Machine code
+$01e3       ; Cassette buffer - ASCII flag 0x00 Binary 0xff ASCII flag
+$01e4       ; Cassette buffer - gap flag 0x00 Continous 0xff Gapped file
+$01e5-$01e6 ; Cassette buffer - Entry (Exec) addr of m/c file
+$01e7-$01e8 ; Cassette buffer - Load address for ungapped m/c file
+$02d9-$02dc ; BASIC line input buffer preamble
+$02dd-$03d8 ; BASIC line input buffer - used for de-/tokenising data
+$02dd-$03dc ; CoCo - 255 byte keyboard buffer {1}
+$02e1-$033b ; CoCo - 90 byte screen buffer {1}
+$03d9-$03ea ; Buffer space
+$03eb-$03fc ; Unused
+$03fd-$03ff ; D32 - Unused in Dragon 32
+$03fd-$03fe ; D64 - Printer end of line delay in milliseconds (0x0000)
+$03ff       ; D64 - %PRNSEL% selects default printer port 0x00 Parallel, non-0x00 Serial (0x00)
+$0400-$05ff ; Default Text screen
+$0600-$1dff ; Available graphics pages w/o DOS
+$0600-$0bff ; DOS - workspace area see also $00ea-$00f6
+$0600-$0dff ; CoCo DOS workspace area (no more info)
+$0c00-$23ff ; DOS - Available graphics pages
+$8000-$bfff ; BASIC ROM in 32K mode
+$8000-$9fff ; CoCo - Extended Color BASIC ROM
+$a000-$bfff ; CoCo - Color BASIC ROM
+$bff0-$bfff ; These addresses mapped from ROM to $fff0-$ffff by the SAM
+$c000-$dfff ; DOS - Dos ROM
+$c000-$feff ; DOS - Cumana DOS ROM only
+$c000-$feff ; Available address range to cartridge expansion port 32K mode
+$c000-$feff ; D64 - 64K mode - copy of BASIC ROM 2 exists in RAM here
+$ff00       ; PIA 0 A side Data reg. PA7    i/p Comparator input PA6    i/p Keyboard Matrix   Ent Clr Brk N/c N/c N/c N/c Shift PA5    i/p Keyboard Matrix   X   Y   Z   Up  Dwn Lft Rgt Space i/p CoCo - Keyboard   8   9   :   ;   ,   -   .   / PA4    i/p Keyboard Matrix   P   Q   R   S   T   U   V   W i/p CoCo - Keyboard   0   1   2   3   4   5   6   7 PA3    i/p Keyboard Matrix   H   I   J   K   L   M   N   O i/p CoCo - Keyboard   X   Y   Z   Up  Dwn Lft Rgt Space PA2    i/p Keyboard Matrix   @   A   B   C   D   E   F   G i/p CoCo - Keyboard   P   Q   R   S   T   U   V   W PA1    i/p Keyboard Matrix   8   9   :   ;   ,   -   .   / i/p CoCo - Keyboard   H   I   J   K   L   M   N   O i/p Left Joystick Button PA0    i/p Keyboard Matrix   0   1   2   3   4   5   6   7 i/p CoCo - Keyboard   @   A   B   C   D   E   F   G i/p Right Joystick Button
+$ff01       ; PIA 0 A side Control reg. CA1    i/p Horiz Sync Interrupt from VDG (15625Hz; CoCo 15750Hz) CA2    o/p Analogue Mux channel select line A Selects Joystick Axis (0 x-axis, 1 y-axis)
+$ff02       ; PIA 0 B side Data reg. PB7    o/p Keyboard Matrix   7   /   G   O   W   Space  Shift o/p Printer Out bit 7 PB6    o/p Keyboard Matrix   6   .   F   N   V   Right  N/c o/p Printer Out bit 6 PB5    o/p Keyboard Matrix   5   -   E   M   U   Left   N/c o/p Printer Out bit 5 PB4    o/p Keyboard Matrix   4   ,   D   L   T   Down   N/c o/p Printer Out bit 4 PB3    o/p Keyboard Matrix   3   ;   C   K   S   Up     N/c o/p Printer Out bit 3 PB2    o/p Keyboard Matrix   2   :   B   J   R   Z      Break o/p Printer Out bit 2 PB1    o/p Keyboard Matrix   1   9   A   I   Q   Y      Clear o/p Printer Out bit 1 PB0    o/p Keyboard Matrix   0   8   @   H   P   X      Enter o/p Printer Out bit 0
+$ff03       ; PIA 0 B side Control reg. CB1    i/p Field Sync Interrupt from VDG (50Hz; CoCo 60Hz) CB2    o/p Analogue Mux channel select line B Selects Joystick (0 right, 1 left)
+$ff04       ; D64 - ACIA serial port read/write data reg.
+$ff05       ; D64 - ACIA serial port status (R)/ reset (W) reg.
+$ff06       ; D64 - ACIA serial port command reg.
+$ff07       ; D64 - ACIA serial port control reg.
+$ff20       ; PIA 1 A side Data reg. PA7    o/p DAC bit 5 PA6    o/p DAC bit 4 PA5    o/p DAC bit 3 PA4    o/p DAC bit 2 PA3    o/p DAC bit 1 PA2    o/p DAC bit 0 PA1    o/p Printer Strobe - Active High (i.e. Lo-Hi-Lo to print) o/p CoCo - RS232 Tx o/p PA0    i/p Cassette waveform single bit input
+$ff21       ; PIA 1 A side Control reg. CA1    i/p Printer Acknowledge i/p CoCo - CD RS232 Carrier Detect input CA2    o/p Cassette Relay Motor control
+$ff22       ; PIA 1 B side Data reg. PB7    o/p *A/G VDG control line PB6    o/p GM2 VDG control line PB5    o/p GM1 VDG control line PB4    o/p GM0 or *INT/EXT VDG control line PB3    o/p CSS VDG control line PB2    i/p D32 - RAM size (0 8 x 32K bit; 1 16 x 16K bit) {6} o/p D64 - ROM select (1 32K mode; 0 64K mode) PB1    i/p Sample audio source o/p Single bit sound output PB0    i/p Printer Busy - Active High i/p CoCo - RS232 Rx input
+$ff23       ; PIA 1 B side Control reg. CB1    i/p Cartridge CART FIRQ auto-start signal CB2    o/p Sound Mux enable (1 enable, 0 single bit sound)
+$ff40       ; DOS - Disk Controller command/status reg.
+$ff41       ; DOS - Disk Controller track reg.
+$ff42       ; DOS - Disk Controller sector reg.
+$ff43       ; DOS - Disk Controller data reg.
+$ff48       ; DOS - Disk Controller hardware control reg.
+$ffc0-$ffdf ; SAM (Synchronous Address Multiplexer) register bits - use even address to clear, odd address to set
+$ffc0-$ffc5 ; SAM VDG Mode registers V0-V2
+$ffc0-$ffc1 ; SAM VDG Reg V0
+$ffc2-$ffc3 ; SAM VDG Reg V1
+$ffc3-$ffc5 ; SAM VDG Reg V2
+$ffc6-$ffd3 ; SAM Display offset in 512 byte pages F0-F6
+$ffc6-$ffc7 ; SAM Display Offset bit F0
+$ffc8-$ffc9 ; SAM Display Offset bit F1
+$ffca-$ffcb ; SAM Display Offset bit F2
+$ffcc-$ffcd ; SAM Display Offset bit F3
+$ffce-$ffcf ; SAM Display Offset bit F4
+$ffd0-$ffc1 ; SAM Display Offset bit F5
+$ffd2-$ffc3 ; SAM Display Offset bit F6
+$ffd4-$ffd5 ; SAM Page #1 bit - in D64 maps upper 32K Ram to $0000 to $7fff
+$ffd6-$ffd9 ; SAM MPU Rate R0-R1
+$ffd6-$ffd7 ; SAM MPU Rate bit R0
+$ffd8-$ffd9 ; SAM MPU Rate bit R1
+$ffda-$ffdd ; SAM Memory Size select M0-M1
+$ffda-$ffdb ; SAM Memory Size select bit M0
+$ffdc-$ffdd ; SAM Memory Size select bit M1
+$ffde-$ffdf ; SAM Map Type - in D64 switches in upper 32K RAM $8000-$feff
+$ffec-$ffef ; PC-Dragon - Used by Paul Burgin's emulator to provide enhanced services
+$fff0-$ffff ; 6809 interrupt vectors mapped from $bff0-$bfff by SAM
+$fff0-$fff1 ; Reserved ($0000; D64 64K mode 0x3634 '64')
+$fff2-$fff3 ; SWI3  ($0100)
+$fff4-$fff5 ; SWI2  ($0103)
+$fff6-$fff7 ; FIRQ  ($010f)
+$fff8-$fff9 ; IRQ  ($010c)
+$fffa-$fffb ; SWI  ($0106)
+$fffc-$fffd ; NMI  ($0109)
+$fffe-$ffff ; RESET  ($b3b4; D64 64K mode $c000 - never accessed)
+$8000-$8002 ; Hardware Initialisation (JMP $bb40; D64 JMP $bb3c)
+$8003-$8005 ; Software Initialisation (JMP $bb88)
+$8006-$8008 ; %POLCAT% Scans keyboard, rets value in A (JMP $bbe5) Called indirectly from [$a000]
+$8009-$800b ; %CBLINK% Cursor Blink (JMP $bbb5)
+$800c-$800e ; %CHROUT% Write chr in A to screen (JMP $bcab)
+$800f-$8011 ; %LPOUT% Line printer character output in A reg., forces end-of-line  sequences, outputs extra spaces to cause LFs etc. See: $0099-009c, $0148 (JMP $bd1a)
+$8012-$8014 ; Reads Joystick (JMP $bd52) Called indirectly from [$a00a]
+$8015-$8017 ; Cassette relay on (JMP $bdcf)
+$8018-$801a ; Cassette relay off (JMP $bddc)
+$801b-$801d ; Write leader to cassette (JMP $be68) Called indirectly from [$a00c]
+$801e-$8020 ; Output byte in A to cassette (JMP $be12)
+$8021-$8023 ; Cassette on, init for reading (JMP $bde7) Called indirectly from [$a004]
+$8024-$8026 ; Input byte from cassette into A (JMP $bdad)
+$8027-$8029 ; Get one bit from cassette to CC.C (JMP $bda5)
+$802a-$802c ; Reads a byte from serial port (JMP $be7b)
+$802d-$802f ; Sends a byte to serial port (D32 JMP $be7c; D64 JMP $be98)
+$8030-$8032 ; Set serial port baud rate (D32 JMP $be7d; D64 JMP $bea6)
+$8033-$8153 ; Reserved words table
+$8154-$81c9 ; Reserved words dispatch table (Tokens 0x80-0xba only)
+$81ca-$824f ; Function words table
+$8250-$8293 ; Function words dispatch table
+$8294-$82a8 ; Another dispatch table: 0x79, $910e   + 0x79, $9105 - 0x7b, $9275 * 0x7b, $933c / 0x7f, $96a0 ^ 0x50, $8a12 AND 0x46, $8a11 OR The related functions come from {2, p.347}
+$82a9-$82de ; Error code table
+$82df-$82e5 ; ' ERROR', 0x00
+$82e6-$82ea ; ' IN ', 0x00
+$82eb-$82ef ; 0x0d, 'OK', 0x0d, 0x00
+$82f0-$82f6 ; 0x0d, 'BREAK', 0x00
+$8344       ; System Error - generates error message according to B (CoCo $ac46)
+$8371       ; Prints OK prompt and returns to Command mode (CoCo $ac73)
+$83ed       ; BasVect2 - completes init once BASIC program loaded (CoCo $acef)
+$8415       ; NEW token dispatch address
+$8417       ; Erases program in memory same as NEW (CoCo $ad19) {1} Called from BASIC init routine ($b3ba)
+$841f       ; BasVect1 - sets up various vectors after a BASIC program loaded (CoCo $ad21)
+$8434       ; Resets stack - all entries are lost (CoCo $ad33)
+$8448       ; FOR token dispatch address
+$849f       ; RUN BASIC - runs BASIC program in mem used by Autorun programs (CoCo $ad9e)
+$8514       ; RESTORE token dispatch address
+$852b       ; Waits for key press, returns key in A (CoCo $adfb)
+$8532       ; END token dispatch address
+$8539       ; STOP token dispatch address
+$8560       ; CONT token dispatch address
+$8571       ; CLEAR token dispatch address
+$85a5       ; RUN token dispatch address
+$85b9       ; GO token dispatch address
+$85f3       ; RETURN token dispatch address
+$8613       ; DATA token dispatch address
+$8616       ; REM, ', ELSE token dispatch address
+$8647       ; IF token dispatch address
+$8675       ; ON token dispatch address
+$86bc       ; LET token dispatch address
+$8705-$870b ; '?REDO', 0x0d, 0x00
+$872b       ; INPUT token dispatch address
+$8777       ; READ token dispatch address
+$8829       ; NEXT token dispatch address
+$8877       ; Get expression: evaluates next expression and puts VARPTR addr in $0052:0053 (CoCo $b146)
+$8887       ; Get string: compiles a string and puts it in free string space (CoCo $b156)
+$89a4       ; CkClBrak: checks cmd line for closed bracket (CoCo $b267)
+$89a7       ; CkOpBrak: checks cmd line for open bracket (CoCo $b26a)
+$89aa       ; CkComa: checks next cmd line chr for a comma, if not a Syntax error is generated (CoCo $b26d)
+$89ac       ; CkChar: as for CkComa but checks for chr in B (CoCo $b26f)
+$89b4       ; Both reserved word and function dispatch tables of Stub 1 at $012a point here
+$8a11       ; OR operator dispatch address (see $8294)
+$8a12       ; AND operator dispatch address (see $8294)
+$8a8b       ; DIM token dispatch address
+$8a94       ; %GETVAR% gets VARPTR addr of following variables name (CoCo $b357)
+$8b29       ; %GETUSR% returns value of arg in USR fn in D (CoCo $b3e9)
+$8b2d       ; %INTCNV%
+$8b30       ; Passes parameters to machine code routine {1}
+$8b39       ; Used to pass back values from m/c to BASIC {1}
+$8b8d-$8b91 ; Jump to this causes ?FC ERROR
+$8c31       ; MEM function token dispatch address
+$8c35-$8c3f ; Assign16Bit: assigns D to numeric variable (CoCo $b4f2) ?? 8c35:8c36 is a BRN
+$8c36-$8c3f ; Assign8Bit: assigns B to numeric variable (CoCo $b4f3) clears A, stores D in FAC
+$8c37-$8c3f ; %GIVABF% returns D as 16bit val in FAC
+$8c40       ; STR$ function token dispatch address
+$8cd7       ; Forces String space Garbage collection (CoCo $b591)
+$8d9a       ; Sub -
+$8d9f       ; %DELVAR% frees space taken by variable (CoCo $b659)
+$8dc7       ; LEN function token dispatch address
+$8dd2       ; CHR$ function token dispatch address
+$8de6       ; ASC function token dispatch address
+$8df1       ; LEFT$ function token dispatch address
+$8e0e       ; RIGHT$ function token dispatch address
+$8e15       ; MID$ function token dispatch address
+$8e51       ; Get8Bit: returns value of following number in B (CoCo $b70b)
+$8e5c       ; VAL function token dispatch address
+$8e83       ; Get16Bit: returns value of following number in X (CoCo $b73d)
+$8e96       ; PEEK function token dispatch address
+$8e9d       ; POKE token dispatch address
+$8ea4       ; LLIST token dispatch address
+$8eaa       ; LIST token dispatch address, List Basic to DEVN (CoCo $b764)
+$903d       ; PRINT token dispatch address
+$90a1       ; Print CR/LF: moves cursor posn to start of new line (CoCo $b958)
+$90e5       ; Out String: Prints ASCIIZ string ptd to by X to DEVN (CoCo $b99c)
+$9105       ; - operator dispatch address (see $8294)
+$910e       ; + operator dispatch address (see $8294)
+$923c       ; LOG function token dispatch address
+$9275       ; * operator dispatch address (see $8294)
+$933c       ; / operator dispatch address (see $8294)
+$93bf-$93d4 ; %MOVFM% Converts a 5-byte BASIC Real variable structure pointed to by X to FAC at $004f {2}
+$9425       ; SGN function token dispatch address
+$942d       ; Jumped to from GIVABF routine at 8c37-8c3f - returns 16 bit value in FAC to BASIC ??
+$943e       ; ABS function token dispatch address
+$9499       ; INT function token dispatch address
+$9564-$9568 ; 5 byte floating point number
+$9569-$956d ; 5 byte floating point number
+$956e-$9572 ; 5 byte floating point number
+$957a       ; Print Number: outputs D as number to DEVN (CoCo $bdcc)
+$9697       ; SQR function token dispatch address
+$96a0       ; ^ operator dispatch address (see $8294)
+$9713       ; EXP function token dispatch address
+$9772       ; RND function token dispatch address
+$978e       ; Random Number: generates 8bit random number in $0116
+$97cb       ; COS function token dispatch address
+$97d1       ; SIN function token dispatch address
+$9816       ; TAN function token dispatch address
+$9877       ; ATN function token dispatch address
+$98e3       ; Called from BASIC init routine ($b3ba-)
+$9956       ; FIX function token dispatch address
+$9965       ; EDIT token dispatch address
+$9ad9       ; TRON token dispatch address
+$9ada       ; TROFF token dispatch address
+$9ade       ; POS function token dispatch address
+$9af4       ; VARPTR function token dispatch address
+$9b84       ; STRING$ function token dispatch address
+$9bb4       ; INSTR function token dispatch address
+$9c3e       ; Assign16BitB: assigns value in $0052:0053 to a variable (CoCo $880e)
+$9c81       ; DEF token dispatch address
+$9d00-$9d0c ; Sub
+$9d0d-$9d1c ; Sub which returns a ptr in X to the address in the USR table (ref'd by $00b0:00b1) of the USR function to be called
+$9d1d       ; USR function token dispatch address
+$9d35-$9d3c ; Sub which checks for '=' token, then gets value of next expression by JMPing to $8e83
+$9d3d       ; IRQ interrupt service routine
+$9d59       ; TIMER function token dispatch address
+$9d61       ; DEL token dispatch address
+$9dfa       ; RENUM token dispatch address
+$9fca-$9fcd ; 3 bytes Unused ? 'UL '
+$9fce-$9fff ; D32 - Unused 0x00
+$9fd0-$9fd8 ; D64 - Patch to support VARPTRs >32K
+$9fd9-$9fff ; D64 - Unused 0x00
+$a000-$a00d ; Indirect jump table
+$a000-$a001 ; Keyboard input ($8006)
+$a002-$a003 ; Character output in A to DEVNUM ($b54a)
+$a004-$a005 ; Cassette on for reading ($8021)
+$a006-$a007 ; Block input from tape ($b93e)
+$a008-$a009 ; Block output to tape ($b999)
+$a00a-$a00b ; Joystick input ($8012)
+$a00c-$a00d ; Write leader to cassette ($801b)
+$a00e       ; HEX$ function token dispatch address
+$a049       ; DLOAD token dispatch address
+$a0e0       ; Can be used to wait for 2 keypresses {1}
+$a0ea       ; Waits for keypress with flashing cursor (CoCo $8cc6)
+$a0f4       ; Sub: called from DLOAD routine
+$a438-$a440 ; Sub - returns CC.C set if A is not char '0'-'9'
+$a6ef       ; PSET token dispatch address
+$a6f3       ; PRESET token dispatch address
+$a6c7       ; PPOINT function token dispatch address
+$a749       ; LINE token dispatch address
+$a8c0       ; PCLS token dispatch address
+$a8c7       ; Clear Graphics: Clears current graphics screen with data in B (CoCo $9539)
+$a8d4       ; COLOR token dispatch address
+$a928       ; Set Colours: sets up locations $00b4, $00b5 (CoCo $959a)
+$a938       ; Select Display: Selects Text (CC.Z=1) or Graphics (CC.Z=0) mode (CoCo $95aa)
+$a93a       ; Reset VDU: resets default VDU mode (CoCo $95ac)
+$a989       ; Set VDG Mode given in A (CoCo $95fb)
+$a99d       ; Set VDG Offset for graphics mode (CoCo $960f)
+$a9a4       ; Set VDG Colour set from $00c1 (CoCo $9616)
+$a9af       ; PMODE token dispatch address
+$a9e1       ; Set Page to B (CoCo $9653)
+$a9fe       ; SCREEN token dispatch address
+$aa10       ; Select Colour set 0 or 1 from B (CoCo $9682)
+$aa19       ; PCLEAR token dispatch address
+$aa23       ; Reserve HiRes Graphics RAM, moves BASIC if nec. (CoCo $9695)
+$aa81       ; Called from BASIC init routine ($b3ba-)
+$aabe       ; PCOPY token dispatch address
+$aada-$aaef ; Sub - reads and checks PCOPY page numbers
+$aaf0       ; GET token dispatch address
+$aaf3       ; PUT token dispatch address
+$abd4-$abec ; 5 entry table of form Word, Word, Token for matching PUT mode
+$ac87       ; PAINT token dispatch address
+$adbd       ; PLAY token dispatch address
+$ae9a       ; Play Note: A contains ASCII code (CoCo $9ad7)
+$af33       ; Sub - gets next PLAY cmd in A
+$afd9       ; PLAY IRQ routine - branches to $bb02 if $00e3 == 0x0000
+$aff6-$affc ; Table maps PLAY notes A-G to tone number
+$affd-$b014 ; Table
+$b015-$b050 ; Table
+$b051       ; DRAW token dispatch address (CoCo $9cb6)
+$b238       ; CIRCLE token dispatch address
+$b39b-$b3b3 ; Called after Hardware init routine, following a RESET Inits stack, checks for Cold/warm start.  If $0071 contains 0x55 and $0072:0073 points to NOP then execution is passed to [$0072:0073] otherwise branches to $b3ba
+$b3b4-$b3b9 ; RESET interrupt service routine (CoCo $a027) Loads Y with $b39b and JMPs $8000
+$b3ba       ; Cold start routine - clears lo mem, inits BASIC
+$b400       ; Boot Basic: Restarts BASIC interpreter (CoCo $a0b6)
+$b432-$b43b ; Checks for $c000:c001 = 0x444b ('DK') and branches to $c002 if found
+$b44f       ; Warm start RESET jumps here
+$b469-$b46e ; FIRQ interrupt service routine - branches to $b46f if source was cartridge else RTI
+$b46f-$b47a ; Calls $b480 twice, then JMPs to $8000 with Y = $b47b
+$b47b-$b47f ; CLRs $0071, then JMPs $c000 to start cartridge
+$b480-$b486 ; Loads X from $008a (0x0000) and decrements to 0x0000 Gives 524,298 cycle, approx. 590ms delay
+$b487-$b494 ; 14 bytes copied to $009d-$00aa at startup
+$b495-$b4b2 ; 30 bytes copied to $010c-$0129 at startup
+$b4b3-$b4cc ; '(C) 1982 DRAGON DATA LTD ', 0x0d
+$b4cd-$b4ec ; '16K BASIC INTERPRETER 1.0      ', 0x0d
+$b4ed-$b504 ; '(C) 1982 BY MICROSOFT', 0x0d, 0x0d, 0x00
+$b505       ; Waits for key with cursor ? Called from SuperDos E6 ROM
+$b54a       ; %OUTCHR% Sends char in A to DEVN (CoCo $a282) Called indirectly from [$a002]
+$b64c       ; CLOSE token dispatch address
+$b65f       ; Close files: closes an open tape stream (CoCo $a42d)
+$b682       ; CSAVE token dispatch address
+$b6d4       ; CLOAD token dispatch address
+$b6a5       ; Write BASIC: writes BASIC program to cassette (CoCo $a469)
+$b714       ; Loads a headerless program from cassette {10}
+$b748       ; Read Binary file from tape (CoCo $a511)
+$b770       ; EXEC token dispatch address
+$b796       ; INKEY$ function token dispatch address
+$b7cc       ; Copy B bytes from X to U
+$b800       ; EOF function token dispatch address
+$b81e       ; SKIPF token dispatch address
+$b828       ; OPEN token dispatch address
+$b8b3       ; Find File: searches tape for matching filename (CoCo $a681)
+$b933       ; Read 1st Block: reads filename block to cas. buf (CoCo $a701)
+$b93e       ; %BLKIN% reads a block of data into cas. buffer (CoCo $a70b) Called indirectly from [$a006]
+$b981       ; MOTOR token dispatch address
+$b991       ; Write 1st Block (CoCo $a7e5)
+$b999-$b9d1 ; %BLKOUT% writes a block of data to cassette (CoCo $a7f4) Called indirectly from [$a008]
+$b9cd-$b9d1 ; Write byte 0x55 to cassette by JMPing to $801e
+$b9cf-$b9d1 ; JMPs to $801e to write byte in A
+$b9d2       ; SET token dispatch address
+$b9df       ; Set LoRes Pixel: X contains screen addr, B the colour and $00b8 the OR data (CoCo $a88d)
+$ba03       ; RESET token dispatch address
+$ba07       ; Reset LoRes Pixel: X contains screen addr, $00b8 OR data (CoCo $a8b5)
+$ba28       ; Calc LoRes Pixel Pos: Stack contains vert and horiz coords (CoCo $a8d9)
+$ba44       ; POINT function token dispatch address
+$ba5f       ; CLS token dispatch address
+$ba77-$ba85 ; Clears text screen (CoCo $a928)
+$ba79-$ba85 ; Clears text screen with value in B (CoCo $a92a)
+$ba86-$ba8d ; Clears screen, prints '(C) 1982 BY MICROSOFT' msg at $b4ec
+$ba9a       ; SOUND token dispatch address
+$baa0       ; Produces Beep of length B, pitch in $008c (CoCo $a951)
+$bac3       ; Audio off: Disables sound (CoCo $a974)
+$bac5-$bad3 ; Enables sound (CoCo $a976)
+$bad4-$bade ; Reset DAC - writes (D32 0x7e; D64 0x7c) to D/A (CoCo $a985)
+$bad6-$bade ; Writes A to DAC - bits 0,1 of A must be 0 (CoCo $a987)
+$badf       ; AUDIO token dispatch address
+$baec       ; AUDIO ON: B must be 0x00 on entry (CoCo $a99d)
+$baf1-$bb01 ; Sub to init PIA for sound source output specified by the lower 2 bits of B - 00 = DAC, 01 = Tape input, 10 = External Cart source, 11 = none This code duplicates the function of $bd41-bd51, the only dif being an ASRB replacing a RORB
+$bb02-$bb0c ; Interrupt service subroutine to decrement $008d:008e, returns with RTI
+$bb0d       ; JOYSTK function token dispatch address
+$bb26-$bb34 ; Jumped to from selfmodifying CHRGET routine at $009f
+$bb3c-$bb87 ; D64 - Hardware init, JMPd to from $8000, Y should contain return address
+$bb40-$bb87 ; D32 - Hardware init, JMPd to from $8000, Y should contain return address
+$bb80-$bb82 ; D64 - Boots 64K mode with JMP $bf49
+$bb88-$bb9e ; Software init, JMPd to from $8003, inits $008f-009b, $0148-0150 with ROM defaults
+$bb92-$bb94 ; D64 - patched to JSR $BEFF (CLR $03fd-03ff; LDU #$0148)
+$bb97-$bb9e ; CopyXtoU - copies B bytes from X to U
+$bb9f-$bbab ; default values for $008f-009b
+$bbac-$bbb4 ; default values for $0148-0150
+$bbb5-$bbcc ; Flashes cursor, JMPd to from $8009 (CoCo $a199)
+$bbc5-$bbcc ; Decrements X from 0x045e, gives 1ms delay
+$bbc8-$bbcc ; Decrements X until 0 then returns
+$bbcd-$bbd9 ; subroutine
+$bbe5-$bbea ; %INCH% Scans keyboard, returns char in A, JMPd to from $8006 (CoCo $a1c1)
+$bbec       ; Keyboard polling sub, returns key code in A
+$bca0       ; Clear VDU line from cursor posn (CoCo $a323)
+$bcab       ; %OUTCH% Put char in A to screen, JMPd to from $800c (CoCo $a30a)
+$bcf5-$bd09 ; %TXLPCH%  Low level routine to print char in A (CoCo $)
+$bd0a       ; PCRLF: moves print head to next line
+$bd1a       ; Send char in A to printer, JMPd to from $800f (CoCo $a2bf) D64 - This routine uses Y as well and is source of a bug in the Clear-J fn of Visitext Word-Pro.
+$bd41-$bd51 ; %SNDSEL%  Selects Analogue Mux channel from B.  Used to read Joysticks or set sound channel (CoCo $a9a2) 0x00 DAC       / Right Joystick, x-axis 0x01 Cassette  / Right Joystick, y-axis 0x02 Cartridge / Left Joystick, x-axis 0x03 Unused    / Left Joystick, y-axis See also $baf1-bb01
+$bd52       ; %JOYIN% Reads Joysticks updates $015a-015d, JMPd to from $8012 (CoCo $a9de)
+$bd8a-$bd90 ; Increments $0082, samples Cassette input bit into CC.C
+$bd91-$bd9d ; Sub
+$bd97-$bd9d ; Sub
+$bd99-$bd9d ; Sub
+$bd9e       ; Sub
+$bda0       ; Sub
+$bda5       ; %BITIN% Get one bit from cassette to CC.C, JMPd to from $8027 (CoCo $a755)
+$bdad       ; %CBIN% Input byte from cassette into A, JMPd to from $8024 (CoCo $a749)
+$bdb9       ; Sub
+$bdbf       ; Sub
+$bdcf-$bddb ; %CASON% Motor on - Turns on relay, loads X with delay value from $0095:0096 (0xda5c) then LBRAs to $bbc8, JMPd to from $8015 (CoCo $a7ca)
+$bddc-$bde6 ; %CASOFF% Motor off - turns relay off, re-enables FIRQ, IRQ, JMPd to from $8018 (CoCo $a7eb)
+$bde7       ; %CSRDON% Read Leader - Disables FIRQ, IRQ, Cassette on, init for reading, JMPd to from $8021 (CoCo $a77c)
+$be12-$be43 ; %CBOUT% Output byte in A to cassette, JMPd to from $801e (CoCo $a82a)
+$be44-$be67 ; 36 bytes of Sine Wave data in upper 5 bits of each byte.
+$be68-$be7a ; %WRTLDR% disables FIRQ, IRQ, turns on cassette, writes number of leader bytes = 0x55 according to $0090:0091 (d32 0x0080), JMPd to from $801b Pre: B,Y Des: CC,A,X Ret: X=0x0000,A=0x55
+$be7b       ; D32 - JMPd to from $802a (RTS)
+$be7b-$be97 ; D64 - Read byte from serial port to A, JMPd to from $802a
+$be7c       ; D32 - JMPd to from $802d (RTS)
+$be7d-$be7e ; D32 - JMPd to from $8030 (COMB; RTS)
+$be7f-$bfef ; D32 - Unused area, all 0x00
+$be98-$bea5 ; D64 - Output byte in A to serial port, JMPd to from $802d
+$bea6-$bebd ; D64 - Set baud rate in B, JMPd to from $8030
+$bebe-$bec4 ; D64 - Lookup table to map B to ACIA baud rate constant
+$bec5-$beda ; D64 - Key scan which pauses printer during printing {8}
+$beff-$bf0b ; D64 - Patched into Software init to CLR $03fd-03ff
+$bf0c-$bf1f ; D64 - handles serial printer end of line delay
+$bf20-$bf48 ; D64 - IRQ routine which can be hooked in D32 mode to provide 64 mode style auto-repeat and serial support
+$bf49-$bf59 ; D64 - Copies 64 mode bootstrap code to $01da and JMPs EXEC points here at startup.
+$bf5a-$bfe8 ; D64 - Bootstrap routine code copied to $01da-0268
+$bf9c-$bf9d ; D64 - '64' Can be used to check for D64 32k mode ROM
+$bfe9-$bfef ; D64 - Unused 0x00
+$bff0-$bfff ; 6809 interrupt vectors mapped to $fff0-$ffff by SAM
+$bff0-$fff1 ; Reserved     ($0000)
+$bff2-$bff3 ; SWI3 vector  ($0100)
+$bff4-$bff5 ; SWI2 vector  ($0103)
+$bff6-$bff7 ; FIRQ vector  ($010f)
+$bff8-$bff9 ; IRQ vector   ($010c)
+$bffa-$bffb ; SWI vector   ($0106)
+$bffc-$bffd ; NMI vector   ($0109)
+$bffe-$bfff ; RESET vector ($b3b4)
