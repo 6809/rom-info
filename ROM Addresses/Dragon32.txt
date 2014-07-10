@@ -414,6 +414,36 @@ $90a1       ; Print CR/LF: moves cursor posn to start of new line (CoCo $b958)
 $90e5       ; Out String: Prints ASCIIZ string ptd to by X to DEVN (CoCo $b99c)
 $9105       ; - operator dispatch address (see $8294)
 $910e       ; + operator dispatch address (see $8294)
+
+$9165       ; clear temporary exponent accumulator FAC0
+$9166       ; test FAC0 msb of mantissa
+$9168       ; branch if FAC0 exponent is not 0
+$916a-9178  ; If FAC0 MSB ==0: Shift FAC0 mantissa a whole byte at a time.
+$917a       ; Replace FAC0 mantissa LSB
+$917c       ; shifting one byte = 8 bit shifts; add 8 to exponent 
+$917e       ; check for 5 shifts
+$9180       ; branch if < 5 shifts, if > 5, then FAC0 mantissa = 0
+$9182-$9183 ; zero FAC0 exponent
+$9185       ; zero FAC0 mantissa sign
+$9188       ; Shift FAC0 mantissa to right
+$918d       ; add one to FAC0 exponent
+$918e       ; $63: shift left floating point sub byte (fifth byte)
+$9190       ; $53: shift left FAC0 MANTISSA LS Least Significant Byte
+$9192       ; $52: shift left FAC0 MANTISSA NLS Next Least Significant Byte
+$9194       ; $51: shift left FAC0 MANTISSA NMS Next Most Significant Byte
+$9196       ; $50: shift left FAC0 MANTISSA MS Most Significant Byte
+$9198       ; branch if FAC0 not yet normalized
+$919a       ; get current FAC0 exponent
+$919c       ; save FAC0 exponent modifier caused by normalization
+$919e       ; subtract accumulated FAC0 exponent modifier
+$91a0       ; save as new FAC0 exponent
+$91a2       ; set FAC0 = 0 if the normalization caused        
+
+$91a7       ; sub byte bit 7 to carry - use as round-off flag (truncate the rest of sub byte)
+$91a9       ; clear, but do not change carry flag
+$91ab       ; clear the sub byte (fifth byte) 
+$91ad       ; go round-off result 
+
 $923c       ; LOG function token dispatch address
 $9275       ; * operator dispatch address (see $8294)
 $933c       ; / operator dispatch address (see $8294)
