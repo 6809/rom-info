@@ -2,6 +2,8 @@
 
 Collected informations and comments for 6809 ROM Images like Dragon 32 / 64 etc...
 
+All scripts are licensed under GNU GPL v3 or above.
+
 Existing Information files are:
 
 === Dragon 32
@@ -18,6 +20,17 @@ About the ROM and disassemble it, read:
 
 The Dragon 64 ROM Files can be downloaded here:
 * http://archive.worldofdragon.org/archive/index.php?dir=Roms/Dragon/
+
+== Scripts
+
+You can add comments into a existing ROM disassemble listing with the Python script:
+[[https://github.com/6809/rom-info/blob/master/ROM%20Addresses/add_comments.py|ROM Addresses/add_comments.py]]
+
+e.g.:
+{{{
+~$ cd rom-info/ROM Addresses
+~/rom-info/ROM Addresses$ python add_comments.py ~/path/to/d32.lis ~/path/to/d32_comments.lis --meminfo="Dragon32.txt"
+}}}
 
 == Links
 
